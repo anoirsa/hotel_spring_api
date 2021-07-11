@@ -42,27 +42,28 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private  int floorNum;
-    private boolean availability;
+
     private  String description;
-
-
+    private Integer originalPrice;
     @OneToMany(
-            mappedBy = "room",
-            orphanRemoval = true,
+            mappedBy ="roomToBeReserved",
             cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
+            fetch = FetchType.EAGER ,
+            orphanRemoval = true
     )
-    private List<Visitor> visitors = new ArrayList<>();
+
+    private List<Reservation> reservations = new ArrayList<>();
+
 
 
 
     public Room(String roomId, RoomType roomType,
-                int floorNum, boolean availability,
+                int floorNum,
                 String description) {
         this.roomId = roomId;
         this.roomType = roomType;
         this.floorNum = floorNum;
-        this.availability = availability;
+
         this.description = description;
     }
 

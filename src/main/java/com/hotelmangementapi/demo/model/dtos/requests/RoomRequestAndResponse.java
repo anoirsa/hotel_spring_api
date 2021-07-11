@@ -13,9 +13,9 @@ public class RoomRequestAndResponse {
 
     private String roomId;
     private RoomType roomType;
-    private  int floorNum;
-    private boolean availability;
+    private  Integer floorNum;
     private  String description;
+    private Integer originalPrice;
 
 
 }

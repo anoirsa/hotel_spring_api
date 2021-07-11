@@ -1,6 +1,7 @@
 package com.hotelmangementapi.demo.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotelmangementapi.demo.service.securityservices.JwtTokenServices;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
     private final AuthenticationManager authenticationManager;
     private final  JwtConfig jwtConfig;
+    private final JwtTokenServices jwtTokenServices;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -51,17 +53,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response
             , FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
-        //String secretKey = "vsdlövsdvsdvvsdkvlkdfklvkldfklkafbafreiutuhybpdopvofaopvoadbgrjbjrowfi2€%##%%#)TJIgie@@2dcscdsvdfvfdvfdvdgjsdc";
-
-        String token = Jwts.builder()
-                .setSubject(authResult.getName())
-                .claim("authorities", authResult.getAuthorities())
-                .setIssuedAt(new Date())
-                .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusWeeks(2)))
-                .signWith(jwtConfig.getSecretKeyBytes())
-                .compact();
-
-
+        String token = jwtTokenServices.generateToken(authResult);
         response.addHeader(jwtConfig.getAuthorizationHeader(), jwtConfig.getTokenPrefix() + token);
         response.setStatus(920);
 

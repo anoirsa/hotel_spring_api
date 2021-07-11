@@ -1,13 +1,17 @@
 package com.hotelmangementapi.demo.security;
 
+import com.hotelmangementapi.demo.repository.JwtTokenModelRep;
+import com.hotelmangementapi.demo.repository.RoomRepJpa;
 import com.hotelmangementapi.demo.security.jwt.JwtConfig;
 import com.hotelmangementapi.demo.security.jwt.JwtTokenVerifier;
 import com.hotelmangementapi.demo.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import com.hotelmangementapi.demo.service.securityservices.AppUserService;
+import com.hotelmangementapi.demo.service.securityservices.JwtTokenServices;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -22,13 +26,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtConfig.class)
-
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @AllArgsConstructor
 public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
     private final AppUserService appUserService;
     private final JwtConfig jwtConfig;
+    private final JwtTokenServices jwtTokenServices;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -36,10 +41,9 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(),jwtConfig))
-                .addFilterAfter(new JwtTokenVerifier(jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class)
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(),jwtConfig,jwtTokenServices))
+                .addFilterAfter(new JwtTokenVerifier(jwtConfig,jwtTokenServices), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                //.antMatchers(HttpMethod.GET,"/api/v1/rooms").permitAll()
                 .antMatchers(HttpMethod.POST,"/api/v1/rooms").permitAll()
                 .antMatchers(HttpMethod.POST,"/auth/user/management").permitAll()
                 .anyRequest()

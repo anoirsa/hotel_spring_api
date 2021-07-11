@@ -1,11 +1,14 @@
 package com.hotelmangementapi.demo.service;
 
 import com.hotelmangementapi.demo.model.AppUser;
+import com.hotelmangementapi.demo.model.Reservation;
 import com.hotelmangementapi.demo.model.Room;
 import com.hotelmangementapi.demo.model.Visitor;
 import com.hotelmangementapi.demo.model.dtos.requests.AddUserRequest;
+import com.hotelmangementapi.demo.model.dtos.requests.ReservationRequest;
 import com.hotelmangementapi.demo.model.dtos.requests.RoomRequestAndResponse;
 import com.hotelmangementapi.demo.model.dtos.requests.VisitorRequest;
+import com.hotelmangementapi.demo.model.dtos.responses.ReservationResponse;
 import com.hotelmangementapi.demo.model.dtos.responses.UserResponse;
 import com.hotelmangementapi.demo.model.dtos.responses.VisitorResponse;
 
@@ -18,14 +21,14 @@ public class ProjectMappingServices {
 
     public static Room mapRoomRequestToR(RoomRequestAndResponse request) {
         return new Room(request.getRoomId(), request.getRoomType(),
-                request.getFloorNum(),request.isAvailability(),
+                request.getFloorNum(),
                 request.getDescription());
     }
 
 
     public static  RoomRequestAndResponse mapToResponse(Room room) {
         return new RoomRequestAndResponse(room.getRoomId(), room.getRoomType(), room.getFloorNum(),
-                room.isAvailability(), room.getDescription());
+                 room.getDescription(),room.getOriginalPrice());
     }
 
     public static List<RoomRequestAndResponse> mapToResponseList(List<Room> rooms) {
@@ -43,20 +46,17 @@ public class ProjectMappingServices {
 
     public static Visitor mapToVisitor(VisitorRequest visitorRequest) {
         return new Visitor(visitorRequest.getFirstName(),visitorRequest.getLastName(),
-                visitorRequest.getGender(),convertToLocalDate(visitorRequest.getEntryDay()),
-                convertToLocalDate(visitorRequest.getExpirationDay()), visitorRequest.getRoom(),
-                visitorRequest.getRoomId());
+                visitorRequest.getGender());
     }
 
     public static VisitorResponse mapToVisitorResponse(Visitor visitor) {
-        return new VisitorResponse(visitor.getLastName(),visitor.getGender(),visitor.getEntryDay(),visitor.getExpirationDay());
+        return new VisitorResponse(visitor.getLastName(),visitor.getGender());
     }
 
     public static List<VisitorResponse> mapToListOfVisitor(List<Visitor> visitors) {
         List<VisitorResponse> arrayToBeReturned = new ArrayList<>();
         visitors.forEach(visitor -> {
-            arrayToBeReturned.add(new VisitorResponse(visitor.getLastName(), visitor.getGender(),
-                    visitor.getEntryDay(),visitor.getExpirationDay()));
+            arrayToBeReturned.add(new VisitorResponse(visitor.getLastName(), visitor.getGender()));
         });
         return arrayToBeReturned;
     }
@@ -68,5 +68,20 @@ public class ProjectMappingServices {
 
     public static UserResponse mapToUserResponse(AppUser appUser) {
         return new UserResponse(appUser.getUsername(),appUser.getEmail(),appUser.getAppUserRole());
+    }
+
+
+    public static Reservation mapToReservation(ReservationRequest reservationRequest) {
+        return new Reservation(reservationRequest.getReservationSpecialId(),
+                reservationRequest.getReservedRoomId(),reservationRequest.getVisitorLastName(),reservationRequest.getVisitorFirstName()
+                ,convertToLocalDate(reservationRequest.getStartingDate()),convertToLocalDate(reservationRequest.getEndingDate()),
+                reservationRequest.getRoomType()
+              );
+    }
+
+    public static ReservationResponse mapToReservationResponse(Reservation reservation) {
+        return new ReservationResponse(reservation.getReservationSpecialId(),reservation.getReservedRoomId()
+        ,reservation.getVisitorLastName(),reservation.getStartingDate(),reservation.getEndingDate()
+                ,reservation.getReservationPrice());
     }
 }

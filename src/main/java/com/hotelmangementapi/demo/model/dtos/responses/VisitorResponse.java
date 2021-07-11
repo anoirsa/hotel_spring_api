@@ -17,7 +17,6 @@ public class VisitorResponse {
 
     private String lastName;
     private Gender gender;
-    private LocalDate entryDay;
-    private LocalDate expirationDay;
+
 
 }

@@ -19,10 +19,6 @@ public class VisitorRequest {
     private String firstName;
     private String lastName;
     private Gender gender;
-    private String entryDay;
-    private String expirationDay;
-    private String roomId;
-    private Room room;
 
     public VisitorRequest(String firstName, String lastName,
                           Gender gender, String entryDay, String expirationDay,
@@ -30,8 +26,6 @@ public class VisitorRequest {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.entryDay = entryDay;
-        this.expirationDay = expirationDay;
-        this.roomId = roomId;
+
     }
 }

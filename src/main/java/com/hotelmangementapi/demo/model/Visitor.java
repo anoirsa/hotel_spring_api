@@ -10,6 +10,10 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.CascadeType.*;
 
 @Entity(
         name = "Visitor"
@@ -36,32 +40,25 @@ public class Visitor {
     private Long id;
     private String firstName;
     private String lastName;
-    private String roomSpecialId;
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    private LocalDate entryDay;
-    private LocalDate expirationDay;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "room_id",
-            referencedColumnName = "id",
-            foreignKey = @ForeignKey(
-                    name = "visitor_room_fk"
-            )
+    @OneToMany(
+            mappedBy = "visitorWhoReserved",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL ,
+            orphanRemoval = true
     )
-    private Room room;
-
+    private List<Reservation> reservations = new ArrayList<>();
     public Visitor(String firstName,
-                   String lastName, Gender gender,
-                   LocalDate entryDay, LocalDate expirationDay,
-                   Room room,
-                   String roomSpecialId) {
+                   String lastName, Gender gender
+
+
+                   ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.entryDay = entryDay;
-        this.expirationDay = expirationDay;
-        this.room = room;
+
+
     }
 }

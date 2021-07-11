@@ -24,12 +24,29 @@ public class RoomController {
        // roomService.addRoom(roomRequestAndResponse);
         return roomService.addRoom(roomRequestAndResponse);
     }
-
     @GetMapping
     public @ResponseBody
     List<RoomRequestAndResponse> findAll() {
         return roomService.getAllRooms();
     }
+
+    @DeleteMapping(path = "{id}")
+    @PreAuthorize("hasAnyAuthority('user:remove_room')")
+    public @ResponseBody
+    ResponseResult deleteRoomById(@PathVariable("id")String id) {
+        return roomService.deleteRoomByRoomId(id);
+    }
+
+    @PutMapping("{id}")
+    @PreAuthorize("hasAnyAuthority('user:edit_room')")
+    public @ResponseBody
+    ResponseResult editRoomDetails(@RequestBody RoomRequestAndResponse roomRequestAndResponse,
+                                   @PathVariable String id) {
+        return roomService.editRoomDetails(roomRequestAndResponse,id);
+    }
+
+
+
 
 
 }

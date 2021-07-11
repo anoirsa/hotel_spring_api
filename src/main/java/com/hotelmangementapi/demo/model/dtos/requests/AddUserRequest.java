@@ -9,7 +9,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @Setter
 @Getter
-
 @ToString
 
 public class AddUserRequest {

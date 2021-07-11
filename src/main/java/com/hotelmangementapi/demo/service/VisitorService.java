@@ -20,9 +20,7 @@ public class VisitorService {
     private final RoomRepJpa roomRepJpa;
 
     public ResponseResult addVisitor(VisitorRequest visitorRequest){
-        Room visitorRoom = roomRepJpa.findByRoomId(visitorRequest.getRoomId()).orElseThrow(() ->
-                new IllegalStateException("No room with this ID is found"));
-        visitorRequest.setRoom(visitorRoom);
+
         Visitor visitorTobeAdded = ProjectMappingServices.mapToVisitor(visitorRequest);
         visitorRepJpa.save(visitorTobeAdded);
         boolean additionSuccessful = visitorRepJpa.existsById(visitorTobeAdded.getId());

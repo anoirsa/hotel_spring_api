@@ -1,6 +1,7 @@
 package com.hotelmangementapi.demo.security.jwt;
 
 import com.google.common.base.Strings;
+import com.hotelmangementapi.demo.service.securityservices.JwtTokenServices;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class JwtTokenVerifier extends OncePerRequestFilter {
 
     private final JwtConfig jwtConfig;
+    private final JwtTokenServices jwtTokenServices;
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response, FilterChain
@@ -43,11 +45,21 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
         try {
             String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(),"");
 
-           // String secretKey = "vsdlövsdvsdvvsdkvlkdfklvkldfklkafbafreiutuhybpdopvofaopvoadbgrjbjrowfi2€%##%%#)TJIgie@@2dcscdsvdfvfdvfdvdgjsdc";
-            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(jwtConfig.getSecretKeyBytes())
-                    .parseClaimsJws(token);
-            Claims body = claimsJws.getBody();
+
+
+
+            Claims body = jwtTokenServices.getTokenClaims(token);
+            Object refreshId =  body.get("refreshId");
+            // Token validation
+            // Testing
+            System.out.println("Refresh id is  : " + refreshId);
+            boolean tokenExist = jwtTokenServices.tokenValidation((String) refreshId);
+           // if (tokenExist) throw new IllegalStateException("Token is already used");
+            // Testing
+            jwtTokenServices.saveTokenToUsed(token);
+            System.out.println("Does token exist " + tokenExist);
             String username = body.getSubject();
+
             var authorities = (List<Map<String, String>>) body.get("authorities");
             Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities.stream()
                     .map(m -> new SimpleGrantedAuthority(m.get("authority"))).collect(Collectors.toSet());
@@ -55,7 +67,13 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
                     username,null,simpleGrantedAuthorities
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Invalidate the token
+            //  Generate new refreshed token
+            String refreshedToken = jwtTokenServices.generateToken(authentication);
+            response.addHeader(jwtConfig.getAuthorizationHeader(),refreshedToken);
             filterChain.doFilter(request, response);
+
+
 
         }
 
