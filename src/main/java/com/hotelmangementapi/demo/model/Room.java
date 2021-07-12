@@ -44,7 +44,7 @@ public class Room {
     private  int floorNum;
 
     private  String description;
-    private Integer originalPrice;
+    private Double originalPrice;
     @OneToMany(
             mappedBy ="roomToBeReserved",
             cascade = CascadeType.ALL,
@@ -59,12 +59,13 @@ public class Room {
 
     public Room(String roomId, RoomType roomType,
                 int floorNum,
-                String description) {
+                String description,
+                Double originalPrice) {
         this.roomId = roomId;
         this.roomType = roomType;
         this.floorNum = floorNum;
-
         this.description = description;
+        this.originalPrice = originalPrice;
     }
 
 

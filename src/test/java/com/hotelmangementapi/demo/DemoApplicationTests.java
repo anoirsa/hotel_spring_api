@@ -25,8 +25,8 @@ class DemoApplicationTests {
 
 	@Test
 	public void tester() {
-		Room room1 = new Room("21232", DOUBLE, 2, "Big dsdand good");
-		Room room2 = new Room("Mother", DOUBLE, 2, "Big dsdand good");
+		Room room1 = new Room("21232", DOUBLE, 2, "Big dsdand good",20.00);
+		Room room2 = new Room("Mother", DOUBLE, 2, "Big dsdand good",26.00);
 		roomRepJpa.save(room1);
 		roomRepJpa.save(room2);
 

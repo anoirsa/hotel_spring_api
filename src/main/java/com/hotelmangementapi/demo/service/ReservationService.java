@@ -1,6 +1,7 @@
 package com.hotelmangementapi.demo.service;
 
 
+import com.google.common.util.concurrent.AtomicDouble;
 import com.hotelmangementapi.demo.model.AppUser;
 import com.hotelmangementapi.demo.model.Reservation;
 import com.hotelmangementapi.demo.model.Room;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -44,12 +46,20 @@ public class ReservationService {
         return isRoomAvailable;
     }
 
-    public List<Room> getAvailableRooms(RoomType roomType, LocalDate startDate, LocalDate endDate) {
+    public List<Reservation> getAvailableReservations(RoomType roomType, LocalDate startDate, LocalDate endDate) {
 
         List<Room> rooms = roomRepJpa.findRoomByRoomType(roomType);
         List<Room> availableRooms = rooms.stream().filter(room -> checkAvailabilityOfRoom(startDate, endDate, room.getRoomId()))
                 .collect(Collectors.toList());
-        return availableRooms;
+        List<Reservation> availableReservations = availableRooms.stream().map(room -> new Reservation(null, room.getRoomId(), null, null, startDate, endDate, roomType))
+                .collect(Collectors.toList());
+        List<Double> prices = countPriceForReservationsAvailable(availableRooms, startDate, endDate);
+        for (int i = 0 ; i < rooms.size() ; i++) {
+            availableReservations.get(i).setRoomToBeReserved(availableRooms.get(i));
+            availableReservations.get(i).setReservationPrice(prices.get(i));
+
+        }
+        return availableReservations;
     }
 
     // For normal booker
@@ -57,22 +67,13 @@ public class ReservationService {
 
         LocalDate endDate = ProjectMappingServices.convertToLocalDate(reservationRequest.getEndingDate());
         LocalDate startDate = ProjectMappingServices.convertToLocalDate(reservationRequest.getStartingDate());
+        List<Reservation> availableReservations = getAvailableReservations(reservationRequest.getRoomType(), startDate,endDate);
+        if (availableReservations.size() == 0) throw new IllegalStateException("No available reservation");
+        Reservation reservationToBeAdded = availableReservations.stream().filter(r -> r.getReservedRoomId().equals(reservationRequest.getReservedRoomId()))
+                    .findFirst().orElseThrow(() -> new IllegalStateException("No reservation with this room ID is found"));
+        reservationToBeAdded.setReservationSpecialId(ProjectServices
+                .generateReservationSpecialId(startDate,reservationRequest.getVisitorLastName(),reservationToBeAdded.getReservedRoomId()));
 
-        List<Room> availableRooms = getAvailableRooms(reservationRequest.getRoomType(), startDate,endDate);
-        if (availableRooms.size() == 0) throw new IllegalStateException("No available room");
-        Room room;
-        if (reservationRequest.getRequesterType().equals(BOOKER)) {
-            Random randomChoice = new Random();
-            room = availableRooms.get(randomChoice.nextInt(availableRooms.size()));
-            reservationRequest.setReservedRoomId(room.getRoomId());
-        } else {
-            room = availableRooms.stream().filter(r -> r.getRoomId().equals(reservationRequest.getReservedRoomId()))
-                    .findFirst().orElseThrow(() -> new IllegalStateException("No room with this ID is found"));
-        }
-        reservationRequest
-                .setReservationSpecialId(ProjectServices
-                        .generateReservationSpecialId(startDate,reservationRequest.getVisitorLastName(),room.getRoomId()));
-        Reservation reservationToBeAdded = ProjectMappingServices.mapToReservation(reservationRequest);
         visitorRepJpa.findVisitorByFirstNameAndLastName(reservationRequest.getVisitorFirstName(), reservationRequest.getVisitorFirstName())
                 .ifPresentOrElse((visitor) -> {
                     reservationToBeAdded.setVisitorWhoReserved(visitor);
@@ -82,10 +83,32 @@ public class ReservationService {
                     visitorRepJpa.save(newVisitor);
                     reservationToBeAdded.setVisitorWhoReserved(newVisitor);
                 });
-        reservationToBeAdded.setRoomToBeReserved(room);
         reservationRepJpa.save(reservationToBeAdded);
         ReservationResponse reservationResponse = ProjectMappingServices.mapToReservationResponse(reservationToBeAdded);
         return reservationResponse;
+    }
+
+    public List<Double> countPriceForReservationsAvailable(List<Room> rooms,LocalDate startDate , LocalDate endDate) {
+        List<Double> prices = new ArrayList<>();
+        Double availabilityPrice = 40.00;
+        for (int i = 0 ; i< rooms.size() ; i++)
+        {
+            availabilityPrice = 40.00 - 7.50;
+            if (availabilityPrice <= 10.00) break;
+        }
+        /////////////
+        Integer numberOfDaysFromNow= startDate.getDayOfMonth() - LocalDate.now().getDayOfMonth();
+        Integer numberOfDays = endDate.getDayOfMonth() - startDate.getDayOfMonth();
+        Double fromNowPrice = 50.00;
+        for (int i = 0 ; i < numberOfDaysFromNow ; i++) {
+            fromNowPrice = 50.00 - 5.00;
+            if (fromNowPrice  == 0) break;
+        }
+        for (int i = 0 ; i < rooms.size() ; i++) {
+            Double priceCount = (rooms.get(i).getOriginalPrice() * numberOfDays) + numberOfDaysFromNow + availabilityPrice;
+            prices.add(priceCount);
+        }
+        return prices;
     }
 
 

@@ -30,11 +30,10 @@ public class DemoApplication {
 			appUserRep.save(new AppUser("admin",passwordEncoder.encode("15111996"),"Anouarbelilawoo@outlook",
 					ADMIN));
 			appUserRep.save(new AppUser("candi",passwordEncoder.encode("1234556"),"GOG@gmail.com",MANAGER));
-
-			roomRepJpa.save(new Room("ST-001", RoomType.DOUBLE,2,"Big but small"));
-			roomRepJpa.save(new Room("ST-002", RoomType.DOUBLE,2,"Small but big"));
-			roomRepJpa.save(new Room("ST-003", RoomType.SINGLE,1,"Small but big"));
-			roomRepJpa.save(new Room("ST-004", RoomType.SINGLE,3,"Small but big"));
+			roomRepJpa.save(new Room("ST-001", RoomType.DOUBLE,2,"Big but small",60.00));
+			roomRepJpa.save(new Room("ST-002", RoomType.DOUBLE,2,"Small but big",65.00));
+			roomRepJpa.save(new Room("ST-003", RoomType.SINGLE,1,"Small but big",30.00));
+			roomRepJpa.save(new Room("ST-004", RoomType.SINGLE,3,"Small but big",40.00));
 
 
 

@@ -42,7 +42,7 @@ public class Reservation {
     private LocalDate endingDate;
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
-    private Integer reservationPrice;
+    private Double reservationPrice;
 
     @ManyToOne
     @JoinColumn(

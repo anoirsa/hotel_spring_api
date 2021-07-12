@@ -22,7 +22,7 @@ public class ProjectMappingServices {
     public static Room mapRoomRequestToR(RoomRequestAndResponse request) {
         return new Room(request.getRoomId(), request.getRoomType(),
                 request.getFloorNum(),
-                request.getDescription());
+                request.getDescription(),request.getOriginalPrice());
     }
 
 

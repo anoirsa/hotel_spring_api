@@ -15,7 +15,7 @@ public class RoomRequestAndResponse {
     private RoomType roomType;
     private  Integer floorNum;
     private  String description;
-    private Integer originalPrice;
+    private Double originalPrice;
 
 
 }

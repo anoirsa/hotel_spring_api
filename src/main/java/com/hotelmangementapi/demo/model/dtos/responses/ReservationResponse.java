@@ -17,7 +17,7 @@ public class ReservationResponse {
     private String visitorLastName;
     private LocalDate startingDate;
     private LocalDate endingDate;
-    private Integer reservationPrice;
+    private Double reservationPrice;
 
 
 }
